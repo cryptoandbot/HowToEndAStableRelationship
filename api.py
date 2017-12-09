@@ -6,14 +6,14 @@ api.py
 desc: api for the website
 """
 
-from Flast import Flask, request, json, redirect
-from flast_restful import Resource, Api, reqparse
+from flask import Flask, request, json, redirect
+from flask_restful import Resource, Api, reqparse
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
 from json import dumps
 from random import randint
 
-e = create_engine('sqlite3:///api.sqlite3')
+e = create_engine('sqlite:///api.db')
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 
@@ -37,17 +37,18 @@ def validate(args):
 class AddBlock(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-    	parser.add_argument('username', type=str, required=False)
-    	parser.add_argument('block', type=str, required=True, help="Submission cannot be blank!")
-    	args = parser.parse_args()
-    	if validate(args):
-    		conn = e.connect()
-    		conn.execute("INSERT INTO blocks (username, block) VALUES (?, ?)", args['username'], args['submission'])
-    		return redirect("/uploaded.html")
-    	else:
-    		return redirect("/index.html")
+        parser.add_argument('username', type=str, required=False)
+        parser.add_argument('block', type=str, required=True, help="Submission cannot be blank!")
+        args = parser.parse_args()
+        if validate(args):
+            conn = e.connect()
+            conn.execute("INSERT INTO blocks (username, block, blockType) VALUES (?, ?, ?)", args['username'], args['submission'], args['blockType'])
+            return redirect("/uploaded.html")
+        else:
+            return redirect("/index.html")
 
 class GetUnconfirmedBlock(Resource):
+    @auth.login_required
     def get(self):
         conn = e.connect()
         query = conn.execute("SELECT * FROM blocks WHERE confirmed=0 ORDER BY ID")
@@ -93,14 +94,15 @@ class Block(Resource):
     def get(self, blockID):
         conn = e.connect()
         query = conn.execute("SELECT * FROM blocks WHERE ID=? AND confirmed=1", blockID)
-        return {'block': query.fetchone()}
+        data = query.fetchone()
+        return {'block': {'id':data[0], 'username':data[1], 'block':data[2], 'blockType':data[3]}}
 
-api.add_resource(Block, '/api/v1/<string:blockID>')
+api.add_resource(Block, '/api/v1/howto/<string:blockID>')
 api.add_resource(RandomBlock, '/api/v1/<string:blockType>')
-api.add_resource(DeleteBlock, '/api/v1/delete')
-api.add_resource(ConfirmBlock, '/api/v1/delete')
-api.add_resource(GetUnconfirmedBlock, '/api/v1/unconfirmed')
-api.add_resource(AddBlock, '/api/v1/add')
+api.add_resource(DeleteBlock, '/api/v1/submission/delete')
+api.add_resource(ConfirmBlock, '/api/v1/submission/confirm')
+api.add_resource(GetUnconfirmedBlock, '/api/v1/submission/unconfirmed')
+api.add_resource(AddBlock, '/api/v1/submission/add')
 
 if __name__ == '__main__':
     app.run()
