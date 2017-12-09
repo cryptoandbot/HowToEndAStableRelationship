@@ -39,10 +39,14 @@ class AddBlock(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=False)
         parser.add_argument('block', type=str, required=True, help="Submission cannot be blank!")
+        parser.add_argument('blockType', type=str, required=True)
         args = parser.parse_args()
+        username = args['username']
+        if username == '':
+            username = 'anonymous'
         if validate(args):
             conn = e.connect()
-            conn.execute("INSERT INTO blocks (username, block, blockType) VALUES (?, ?, ?)", args['username'], args['submission'], args['blockType'])
+            conn.execute("INSERT INTO blocks (username, block, blockType) VALUES (?, ?, ?)", username, args['block'], args['blockType'])
             return redirect("/uploaded.html")
         else:
             return redirect("/index.html")
@@ -82,7 +86,11 @@ class RandomBlock(Resource):
     def get(self, blockType):
         conn = e.connect()
         if blockType != 'any':
-            query = conn.execute("SELECT * FROM blocks WHERE confirmed=1 AND blockType=? ORDER BY ID", blockType)
+            if blockType == 'man':
+                query = conn.execute("SELECT * FROM blocks WHERE confirmed=1 AND blockType=? OR blockType=0 ORDER BY ID", 1)
+            elif blockType == 'woman':
+                query = conn.execute("SELECT * FROM blocks WHERE confirmed=1 AND blockType=? OR blockType=0 ORDER BY ID", 0)
+
         else:
             query = conn.execute("SELECT * FROM blocks WHERE confirmed=1 ORDER BY ID")
         blocks = [dict(zip(tuple (query.keys()), i)) for i in query.cursor]

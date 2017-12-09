@@ -3,28 +3,38 @@
 <head>
 	<title>How To End A Stable Relationship</title>
 	<script src="js/jquery.min.js"></script>
-	<script src="js/index.js"></script>
+	<script src="js/index.js?version=3"></script>
+	<script src="js/nav.js?version=1"></script>
 	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
 	<div id="wrapper">
 		<div id="navBar">
-			<script>
-				$(function() {
-					$("#navBar").load("navBar.html");
-				})
-			</script>
+			<div id="navLeft">
+			</div>
+			<div id="navCenter"><span id="homeButton">
+			How To End A Stable Relationship
+			</span></div>
+			<div id="navRight">
+				<div class="button" id="uploadButton">Upload</div>
+				<div class="button" id="aboutButton">About</div>
+			</div>
 		</div>
-		<div id="content">
+		<div id="content" style="height: 90vh; padding-top: 0">
 			<div class="blockType" id="blockMan">
+			Man
 			</div>
 			<div class="blockType" id="blockAny">
+			Either
 			</div>
 			<div class="blockType" id="blockWoman">
+			Woman
 			</div>
 		</div>
 	</div>
 </body>
 </html>
+
