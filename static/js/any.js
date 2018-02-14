@@ -1,6 +1,6 @@
 var loadAny = function() {
 	$.getJSON('/api/v1/any', function(data) {
-		$('#content').html('<p class="block">' + data['block']['block'] + '</p><p class="username">' + data['block']['username'] + '</p>');
+		$('#content').html('<span id="wrapContent"><p class="block">' + data['block']['block'] + '</p><p class="username">' + data['block']['username'] + '</p></span>');
 		if(data['block']['blockType'] == 1) {
 			$('#content').animate({
 				'backgroundColor': '#84B1ED'
@@ -15,6 +15,7 @@ var loadAny = function() {
 			}, 1000);
 		}
 		$('#content').children().fadeIn('slow');
+		$('#content').children().children().fadeIn('slow');
 	})
 }
 
@@ -22,6 +23,7 @@ $(document).ready(loadAny);
 
 var clickRandom = function() {
 	$('#randomButton').click(function() {
+		$('#content').children().children().fadeOut('slow');
 		$('#content').children().fadeOut('slow', function() {
 			loadAny();
 		})
